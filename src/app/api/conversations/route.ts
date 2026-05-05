@@ -65,7 +65,7 @@ export async function GET(req: Request) {
     }
 
     // Format Matches
-    const formattedMatches = matches.map(match => {
+    const formattedMatches = matches.map((match: typeof matches[0]) => {
       const isUser1 = match.user1Id === currentUserId;
       const otherUser = isUser1 ? match.user2 : match.user1;
       return {

@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 const rateLimitMap = new Map<string, { count: number, resetTime: number }>();
 
 export async function middleware(request: NextRequest) {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   
   // Security Layer 1: Rate Limiting
   const limit = 100; // requests

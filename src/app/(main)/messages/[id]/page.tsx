@@ -10,6 +10,7 @@ import Pusher from "pusher-js";
 type Message = {
   id: string;
   senderId: string;
+  receiverId: string;
   content: string;
   createdAt: string;
 };

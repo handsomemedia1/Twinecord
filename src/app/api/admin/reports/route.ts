@@ -11,10 +11,6 @@ export async function GET() {
     }
 
     const reports = await prisma.report.findMany({
-      include: {
-        reporter: { select: { email: true, name: true, profile: { select: { displayName: true } } } },
-        reported: { select: { email: true, name: true, profile: { select: { displayName: true } } } },
-      },
       orderBy: { createdAt: "desc" },
     });
 

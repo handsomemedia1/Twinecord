@@ -58,7 +58,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ message: `Request ${status.toLowerCase()} successfully` }, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ message: error.issues[0].message }, { status: 400 });
     }
     console.error("Respond error:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });

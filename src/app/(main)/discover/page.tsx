@@ -5,6 +5,7 @@ import Image from "next/image";
 
 type ProfileCandidate = {
   id: string;
+  userId: string;
   displayName: string;
   dateOfBirth: string;
   city: string | null;
@@ -13,6 +14,8 @@ type ProfileCandidate = {
   bio: string | null;
   reviewQuestion: string | null;
   isReviewMandatory: boolean;
+  interestTags: string[];
+  photos: string[];
   user: {
     isPremium: boolean;
   };

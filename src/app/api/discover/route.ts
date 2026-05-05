@@ -51,11 +51,11 @@ export async function GET(req: Request) {
 
     const excludedIds = new Set([
       currentUserId,
-      ...sentRequests.map(r => r.receiverId),
-      ...receivedRequests.map(r => r.senderId),
-      ...matches1.map(m => m.user2Id),
-      ...matches2.map(m => m.user1Id),
-      ...userBlocks.map(b => b.blockerId === currentUserId ? b.blockedId : b.blockerId)
+      ...sentRequests.map((r: { receiverId: string }) => r.receiverId),
+      ...receivedRequests.map((r: { senderId: string }) => r.senderId),
+      ...matches1.map((m: { user2Id: string }) => m.user2Id),
+      ...matches2.map((m: { user1Id: string }) => m.user1Id),
+      ...userBlocks.map((b: { blockerId: string; blockedId: string }) => b.blockerId === currentUserId ? b.blockedId : b.blockerId)
     ]);
 
     // 2. Fetch candidates (Profiles)
@@ -114,7 +114,7 @@ export async function GET(req: Request) {
       if (currentUserProfile?.lovePhilosophy && candidate.lovePhilosophy) {
         const myWords = currentUserProfile.lovePhilosophy.toLowerCase().split(" ");
         const theirWords = candidate.lovePhilosophy.toLowerCase().split(" ");
-        const commonWords = myWords.filter(w => w.length > 4 && theirWords.includes(w));
+        const commonWords = myWords.filter((w: string) => w.length > 4 && theirWords.includes(w));
         score += (commonWords.length * 2); // +2 points per common significant word
       }
 
@@ -122,7 +122,7 @@ export async function GET(req: Request) {
     });
 
     // Sort by matchScore descending, then take top 20
-    scoredCandidates.sort((a, b) => b.matchScore - a.matchScore);
+    scoredCandidates.sort((a: { matchScore: number }, b: { matchScore: number }) => b.matchScore - a.matchScore);
     const candidates = scoredCandidates.slice(0, 20);
 
     return NextResponse.json({ candidates }, { status: 200 });

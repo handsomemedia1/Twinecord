@@ -1,0 +1,215 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ===== TWINECORD APP-LIKE DESIGN SYSTEM ===== */
+/* Romantic, love-focused palette: Blush pinks, deep rose, crimson, and soft gold */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --font-heading: 'Playfair Display', serif;
+
+  /* Core tokens */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* TwineCord brand tokens - Romantic Palette */
+  --color-tc-primary: var(--tc-primary);
+  --color-tc-primary-light: var(--tc-primary-light);
+  --color-tc-primary-dark: var(--tc-primary-dark);
+  --color-tc-gold: var(--tc-gold);
+  --color-tc-gold-light: var(--tc-gold-light);
+  --color-tc-blush: var(--tc-blush);
+  --color-tc-dark: var(--tc-dark);
+  --color-tc-dark-light: var(--tc-dark-light);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Custom animations */
+  --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-fade-in-up: fade-in-up 0.7s ease-out both;
+  --animate-slide-up: slide-up 0.5s ease-out both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
+}
+
+/* ===== LIGHT MODE (Warm Blush & Rose) ===== */
+:root {
+  --background: #FFF5F7; /* Very soft blush background */
+  --foreground: #4C1D2A; /* Deep burgundy/brown for text */
+  --card: #FFFFFF;
+  --card-foreground: #4C1D2A;
+  --popover: #FFFFFF;
+  --popover-foreground: #4C1D2A;
+  --primary: #E11D48; /* Crimson / Rose-600 */
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFE4E6; /* Light rose */
+  --secondary-foreground: #BE123C; /* Dark rose */
+  --muted: #FFF0F2;
+  --muted-foreground: #9F5B6A;
+  --accent: #D4A843; /* Warm gold */
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --border: #FCE7F3;
+  --input: #FCE7F3;
+  --ring: #E11D48;
+
+  --radius: 1rem; /* Softer, rounder corners for app feel */
+
+  /* Brand palette */
+  --tc-primary: #E11D48;
+  --tc-primary-light: #FB7185;
+  --tc-primary-dark: #9F1239;
+  --tc-gold: #D4A843;
+  --tc-gold-light: #FDE047;
+  --tc-blush: #FFF5F7;
+  --tc-dark: #2A0E15;
+  --tc-dark-light: #4C1D2A;
+}
+
+/* ===== DARK MODE (Deep Burgundy & Crimson) ===== */
+.dark {
+  --background: #1A0B10; /* Very dark burgundy background */
+  --foreground: #FFE4E6;
+  --card: #2A0E15; /* Dark card background */
+  --card-foreground: #FFE4E6;
+  --popover: #2A0E15;
+  --popover-foreground: #FFE4E6;
+  --primary: #E11D48;
+  --primary-foreground: #FFFFFF;
+  --secondary: #4C1D2A;
+  --secondary-foreground: #FB7185;
+  --muted: #4C1D2A;
+  --muted-foreground: #F43F5E;
+  --accent: #D4A843;
+  --accent-foreground: #1A0B10;
+  --destructive: #F87171;
+  --border: rgba(225, 29, 72, 0.2);
+  --input: rgba(225, 29, 72, 0.2);
+  --ring: #E11D48;
+
+  --tc-primary: #E11D48;
+  --tc-primary-light: #FB7185;
+  --tc-primary-dark: #9F1239;
+  --tc-gold: #D4A843;
+  --tc-gold-light: #FDE047;
+  --tc-blush: #2A0E15;
+  --tc-dark: #1A0B10;
+  --tc-dark-light: #4C1D2A;
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans scroll-smooth;
+  }
+}
+
+/* ===== APP-LIKE UTILITIES ===== */
+
+/* App Container wrapper */
+.app-container {
+  @apply relative max-w-[480px] mx-auto bg-card min-h-screen shadow-2xl shadow-tc-primary/10 sm:my-8 sm:min-h-[90vh] sm:rounded-[2.5rem] sm:border-[8px] sm:border-white/50 dark:sm:border-tc-dark-light/50 overflow-hidden ring-1 ring-border;
+}
+
+/* Sleek glass header */
+.app-header {
+  @apply sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border px-6 py-4 flex items-center justify-between;
+}
+
+/* Gradient Text */
+.text-gradient-romantic {
+  background: linear-gradient(135deg, var(--tc-primary) 0%, #F43F5E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--tc-gold) 0%, var(--tc-gold-light) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* App surface elements */
+.app-surface {
+  @apply bg-card rounded-3xl shadow-sm border border-border p-5;
+}
+
+/* App button overrides */
+.btn-app-primary {
+  @apply w-full bg-gradient-to-r from-tc-primary to-rose-500 hover:from-tc-primary-dark hover:to-tc-primary text-white font-semibold py-4 rounded-2xl shadow-lg shadow-tc-primary/30 transition-all active:scale-[0.98];
+}
+
+.btn-app-secondary {
+  @apply w-full bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold py-4 rounded-2xl transition-all active:scale-[0.98];
+}
+
+/* Floating Action Button (FAB) */
+.app-fab {
+  @apply absolute bottom-8 right-8 w-14 h-14 bg-tc-primary text-white rounded-full flex items-center justify-center shadow-xl shadow-tc-primary/40 hover:scale-105 active:scale-95 transition-all z-40;
+}
+
+/* Decorative heart shape background */
+.bg-heart-glow {
+  background: radial-gradient(circle at center, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+}

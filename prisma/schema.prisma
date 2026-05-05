@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USERS & PROFILES
+// ============================================================================
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String?
+  name             String?
+  role             String    @default("USER") // Was Enum
+  status           String    @default("ACTIVE") // Was Enum
+  isShadowbanned   Boolean   @default(false)
+  isBoosted        Boolean   @default(false) // Admin granted algorithm boost
+  isPremium        Boolean   @default(false)
+  stripeCustomerId String?   @unique
+  emailVerified    DateTime?
+  
+  // Fediverse Crypto Keys
+  publicKey        String?   // @db.Text not supported in SQLite
+  privateKey       String?   // @db.Text not supported in SQLite
+  
+  verificationToken String?  @unique
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  profile          Profile?
+  sentRequests     ConnectionRequest[] @relation("SentRequests")
+  receivedRequests ConnectionRequest[] @relation("ReceivedRequests")
+  messagesSent     Message[] @relation("MessagesSent")
+  messagesReceived Message[] @relation("MessagesReceived")
+  matches1         Match[]   @relation("User1Matches")
+  matches2         Match[]   @relation("User2Matches")
+  posts            Post[]
+  comments         Comment[]
+  securityLogs     SecurityLog[]
+}
+
+model Profile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  displayName       String
+  dateOfBirth       DateTime
+  gender            String
+  city              String?
+  state             String?
+  
+  // Faith & Values
+  denomination      String?
+  churchName        String?
+  baptized          Boolean?
+  attendanceFreq    String?
+  
+  // Intentionality & Philosophy
+  relationshipGoal  String?
+  lovePhilosophy    String?
+  
+  // Advanced Settings
+  reviewQuestion    String?
+  isReviewMandatory Boolean   @default(false)
+  isPaused          Boolean   @default(false) // Snooze account
+  filterMinAge      Int       @default(18)
+  filterMaxAge      Int       @default(99)
+  filterDenomination String?
+  verificationStatus String   @default("VERIFIED") // PENDING_PERSONA, VERIFIED, REJECTED
+  
+  bio               String?
+  interestTags      String[]  @default([])
+  
+  // Real Photos Array (Cloudinary URLs)
+  photos            String[]  @default([])
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ============================================================================
+// MATCHING & CONNECTIONS
+// ============================================================================
+
+model ConnectionRequest {
+  id           String   @id @default(cuid())
+  senderId     String
+  receiverId   String
+  
+  answerToReview String? // @db.Text unsupported
+  status       String @default("PENDING") // Was Enum
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sender       User     @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver     User     @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user2Id   String
+  
+  createdAt DateTime @default(now())
+  
+  user1     User     @relation("User1Matches", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User     @relation("User2Matches", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@unique([user1Id, user2Id])
+}
+
+// ============================================================================
+// MESSAGING
+// ============================================================================
+
+model Message {
+  id                     String   @id @default(cuid())
+  matchId                String?  // Null if it's a premium Direct Message without a match
+  senderId               String
+  receiverId             String
+  content                String   // @db.Text unsupported
+  isPremiumDirectMessage Boolean  @default(false) // Tracking for the 3-limit feature
+  readAt                 DateTime?
+  
+  createdAt              DateTime @default(now())
+
+  match                  Match?   @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  sender                 User     @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver               User     @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// COMMUNITY FEED
+// ============================================================================
+
+model Post {
+  id        String    @id @default(cuid())
+  authorId  String
+  content   String    // Up to 1000 chars enforced in API
+  imageUrls String    @default("[]") // Stringified JSON array
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String   
+  
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// SECURITY & COMPLIANCE
+// ============================================================================
+
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  reportedId  String
+  reason      String
+  matchId     String?  // Optional link to chat context
+  
+  createdAt   DateTime @default(now())
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+}
+
+model BlockedIp {
+  ipAddress String   @id
+  reason    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model SecurityLog {
+  id        String   @id @default(cuid())
+  userId    String?  // Null if action is anonymous (e.g. failed login attempt for unknown email)
+  action    String   // e.g. "LOGIN_SUCCESS", "LOGIN_FAILED", "PROFILE_UPDATED"
+  ipAddress String?
+  userAgent String?
+  
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// Enums removed for SQLite compatibility

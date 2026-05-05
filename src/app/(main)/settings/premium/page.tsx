@@ -1,10 +1,10 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function PremiumSettingsPage() {
+function PremiumContent() {
   const { data: session, update } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
@@ -100,5 +100,13 @@ export default function PremiumSettingsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PremiumSettingsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-64 text-muted-foreground">Loading...</div>}>
+      <PremiumContent />
+    </Suspense>
   );
 }

@@ -3,14 +3,14 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-export async function GET(req: Request, { params }: { params: { matchId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ matchId: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
-    const { matchId } = params;
+    const { matchId } = await params;
 
     // Verify a report actually exists for this match before allowing access
     const reportExists = await prisma.report.findFirst({

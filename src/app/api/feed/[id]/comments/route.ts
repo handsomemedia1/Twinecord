@@ -8,7 +8,7 @@ const commentSchema = z.object({
   content: z.string().min(1, "Comment cannot be empty"),
 });
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -16,7 +16,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const postId = params.id;
+    const { id: postId } = await params;
     const body = await req.json();
     const { content } = commentSchema.parse(body);
 

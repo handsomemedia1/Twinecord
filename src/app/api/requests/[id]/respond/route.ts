@@ -8,7 +8,7 @@ const respondSchema = z.object({
   status: z.enum(["ACCEPTED", "REJECTED"]),
 });
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -19,7 +19,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const body = await req.json();
     const { status } = respondSchema.parse(body);
 
-    const requestId = params.id;
+    const { id: requestId } = await params;
 
     // 1. Find the request
     const request = await prisma.connectionRequest.findUnique({

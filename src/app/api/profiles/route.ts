@@ -18,7 +18,7 @@ const profileSchema = z.object({
   lovePhilosophy: z.string().optional(),
   reviewQuestion: z.string().optional(),
   isReviewMandatory: z.boolean().default(false),
-  // photos would be added here as a JSON string for sqlite
+  photos: z.array(z.string()).optional(),
 });
 
 export async function POST(req: Request) {

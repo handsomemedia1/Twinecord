@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { CldUploadWidget } from "next-cloudinary";
 
 export default function OnboardingWizard() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function OnboardingWizard() {
     lovePhilosophy: "",
     reviewQuestion: "",
     isReviewMandatory: true,
+    photos: [] as string[],
   });
 
   const updateForm = (key: keyof typeof formData, value: any) => {
@@ -281,16 +283,55 @@ export default function OnboardingWizard() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {/* Main Photo slot */}
-              <div className="col-span-2 sm:col-span-1 aspect-[3/4] bg-tc-blush border-2 border-dashed border-tc-primary/30 rounded-2xl flex flex-col items-center justify-center text-tc-primary hover:bg-tc-primary/5 cursor-pointer transition-colors relative overflow-hidden group">
-                <svg className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                <span className="text-sm font-semibold">Main Photo</span>
-              </div>
+              <CldUploadWidget 
+                uploadPreset="twinecord_preset" 
+                onSuccess={(result: any) => {
+                  if (result.event === "success") {
+                    setFormData(prev => ({ ...prev, photos: [...prev.photos, result.info.secure_url] }));
+                  }
+                }}
+              >
+                {({ open }) => (
+                  <div 
+                    onClick={() => open()}
+                    className="col-span-2 sm:col-span-1 aspect-[3/4] bg-tc-blush border-2 border-dashed border-tc-primary/30 rounded-2xl flex flex-col items-center justify-center text-tc-primary hover:bg-tc-primary/5 cursor-pointer transition-colors relative overflow-hidden group"
+                  >
+                    {formData.photos.length > 0 ? (
+                      <Image src={formData.photos[0]} alt="Main" fill className="object-cover" />
+                    ) : (
+                      <>
+                        <svg className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                        <span className="text-sm font-semibold">Main Photo</span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </CldUploadWidget>
               
               {/* Extra Photo slots */}
               {[1, 2, 3, 4, 5].map((idx) => (
-                <div key={idx} className="aspect-[3/4] bg-secondary/30 border-2 border-dashed border-border rounded-2xl flex flex-col items-center justify-center text-muted-foreground hover:bg-secondary/50 cursor-pointer transition-colors">
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                </div>
+                <CldUploadWidget 
+                  key={idx}
+                  uploadPreset="twinecord_preset" 
+                  onSuccess={(result: any) => {
+                    if (result.event === "success") {
+                      setFormData(prev => ({ ...prev, photos: [...prev.photos, result.info.secure_url] }));
+                    }
+                  }}
+                >
+                  {({ open }) => (
+                    <div 
+                      onClick={() => open()}
+                      className="relative aspect-[3/4] bg-secondary/30 border-2 border-dashed border-border rounded-2xl flex flex-col items-center justify-center text-muted-foreground hover:bg-secondary/50 cursor-pointer transition-colors overflow-hidden"
+                    >
+                      {formData.photos.length > idx ? (
+                        <Image src={formData.photos[idx]} alt="Extra" fill className="object-cover" />
+                      ) : (
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                      )}
+                    </div>
+                  )}
+                </CldUploadWidget>
               ))}
             </div>
             <p className="text-xs text-muted-foreground text-center">
